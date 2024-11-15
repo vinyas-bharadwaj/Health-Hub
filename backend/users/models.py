@@ -17,6 +17,10 @@ class Doctor(models.Model):
     username = models.CharField(max_length=150, unique=True)
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)  # Store hashed passwords
+    
+    hospital = models.CharField(max_length=255, null=False, default="")
+    state = models.CharField(max_length=255, null=False, default="")
+    city = models.CharField(max_length=255, null=False, default="")
 
     patients = models.ManyToManyField(Patient, related_name="doctors")
 

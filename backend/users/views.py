@@ -1,6 +1,8 @@
 from django.shortcuts import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
 from .models import Patient, Doctor, Report
-from .serializers import PatientSerializer, ReportSerializer
+from .serializers import PatientSerializer, ReportSerializer, DoctorSerializer
+
 
 # Create your views here.
 from rest_framework.views import APIView
@@ -20,8 +22,17 @@ class RegisterPatientView(APIView):
             return Response({"message": "Patient registered successfully."}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+class RegisterDoctorView(APIView):
+
+    def post(self, request):
+        serializer = DoctorSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Doctor created successfully."}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class PatientListView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         patients = Patient.objects.all()  # Query all Patient objects
         serializer = PatientSerializer(patients, many=True)  # Serialize the queryset
@@ -29,6 +40,7 @@ class PatientListView(APIView):
     
     
 class DoctorPatientsView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, doctor_id):
         try:
             doctor = Doctor.objects.get(id=doctor_id)  # Fetch the doctor by ID

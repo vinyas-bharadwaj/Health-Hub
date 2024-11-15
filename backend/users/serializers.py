@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.hashers import make_password
-from .models import Patient, Report
+from .models import Patient, Report, Doctor
 
 
 class PatientRegisterSerializer(serializers.ModelSerializer):
@@ -24,3 +24,8 @@ class ReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Report
         fields = ['id', 'image', 'patient']
+        
+class DoctorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Doctor
+        fields = ['id', 'username', 'email', 'password', 'hospital', 'state', 'city', 'patients']
