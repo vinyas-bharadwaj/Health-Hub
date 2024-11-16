@@ -15,35 +15,47 @@ from .schemas import user_list_docs
 from rest_framework.decorators import api_view
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 import tensorflow as tf
 from PIL import Image
+from django.core.files.storage import default_storage
+from backend import settings
+import os
+
+
 
 class PredictView(APIView):
-    parser_classes = (MultiPartParser, FormParser)  # Allows handling file uploads
+    parser_classes = (MultiPartParser, FormParser)
 
     def post(self, request, *args, **kwargs):
         if 'image' not in request.FILES:
             return Response({"detail": "No image provided"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Load image from request
+        # Load the uploaded image
         image = request.FILES['image']
         image = Image.open(image)
-        
-        # Assuming your model is loaded and ready to predict
-        model = tf.keras.models.load_model("path/to/your/model.h5")
-        
-        # Preprocess the image to match the input expected by your model
-        image = image.resize((224, 224))  # Example resize
+
+        # Load your pre-trained model (assuming it's a TensorFlow model)
+        model_path = os.path.join(settings.BASE_DIR, 'model.h5')  # Path to your model
+        model = tf.keras.models.load_model(model_path)
+
+        # Preprocess the image to match the input size your model expects
+        image = image.resize((224, 224))  # Example resize to 224x224
         image = np.array(image)  # Convert to NumPy array
-        image = image / 255.0  # Normalize if required
+        image = image / 255.0  # Normalize if necessary
         image = np.expand_dims(image, axis=0)  # Add batch dimension
-        
-        # Make prediction
+
+        # Run prediction
         prediction = model.predict(image)
 
-        # Handle the prediction results and return
-        return Response({"prediction": prediction.tolist()})
+        # Return the prediction result (assuming binary classification)
+        prediction_result = 'Malignant' if prediction[0][0] > 0.5 else 'Benign'
+        
+        return Response({
+            'prediction': prediction_result,
+            'confidence': prediction[0][0]
+        })
 
 
 @api_view(['GET'])

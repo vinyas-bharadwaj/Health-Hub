@@ -40,7 +40,7 @@ urlpatterns = [
     path('api/doctor/<int:doctor_id>/patients/', DoctorPatientsView.as_view(), name='doctor-patients'),
     path('api/doctor/create/', RegisterDoctorView.as_view(), name='create-doctor'),
     path('api/doctor/count', doctor_count, name="doctor-count"),
-    path('api/predict/', PredictView.as_view(), name='predict'),
+    path('api/predict/', PredictView.as_view())
 ] + router.urls
 
 
