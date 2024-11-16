@@ -22,7 +22,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from users.views import RegisterPatientView, PatientListView, DoctorPatientsView, RegisterDoctorView
+from users.views import RegisterPatientView, PatientListView, DoctorPatientsView, RegisterDoctorView, DoctorDetailView, doctor_count, patient_count, PredictView
 
 
 router = DefaultRouter()
@@ -35,8 +35,12 @@ urlpatterns = [
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("api/users/create/", RegisterPatientView.as_view(), name='register'),
     path('api/users/', PatientListView.as_view(), name='patient-list'),
+    path('api/users/count', patient_count, name="patient-count"),
+    path('api/doctor/<int:pk>/', DoctorDetailView.as_view(), name='get-doctor'),
     path('api/doctor/<int:doctor_id>/patients/', DoctorPatientsView.as_view(), name='doctor-patients'),
-    path('api/doctors/create', RegisterDoctorView.as_view(), name='create-doctor'),
-]+ router.urls
+    path('api/doctor/create/', RegisterDoctorView.as_view(), name='create-doctor'),
+    path('api/doctor/count', doctor_count, name="doctor-count"),
+    path('api/predict/', PredictView.as_view(), name='predict'),
+] + router.urls
 
 
